@@ -3,6 +3,7 @@ import os
 import glob
 import re
 from shutil import copyfile
+from pr0nmap.groupxiv import write_js
 
 def parse_html(fn):
     is_gmap = False
@@ -67,9 +68,9 @@ def run():
             dst_fn = "%s/%s.jpg" % (x_dir, y)
             copyfile(src_fn, dst_fn)
 
-    tileSize = 250
-    width = (maxx + 1) * tileSize
-    height = (maxy + 1) * tileSize
+    tile_size = 250
+    width = (maxx + 1) * tile_size
+    height = (maxy + 1) * tile_size
 
     index = None
     if os.path.exists('index.html'):
@@ -89,24 +90,9 @@ def run():
     if copyright:
         chip_name += ', &copy;%s' % copyright
 
-    open('index.html', 'w').write('''\
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Loading...</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script type="text/javascript" src="http://siliconpr0n.org/lib/groupXIV/35-jpg/public_html/bundle/groupxiv.js"></script>
-    <link type="text/css" rel="stylesheet" href="http://siliconpr0n.org/lib/groupXIV/35-jpg/public_html/bundle/groupxiv.css">
-</head>
-<body>
-    <div id="viewer"></div>
-    <script>
-    initViewer({"scale": null, "layers": [{"imageSize": 4096, "width": %u, "height": %u, "URL": "l1", "tileSize": %u, "name": "%s"}], "name": "%s", "name_raw": "%s", "copyright": "%s"});
-    </script>
-</body>
-</html>
-''' % (width, height, tileSize, layer_name, chip_name, chip_name_raw, copyright))
-
+    write_js('index.html',
+                 width, height, tile_size, layer_name, chip_name, chip_name_raw, copyright,
+                 tile_ext='.jpg')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plot')

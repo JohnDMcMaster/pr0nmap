@@ -5,8 +5,8 @@ Copyright 2012 John McMaster <JohnDMcMaster@gmail.com>
 Licensed under a 2 clause BSD license, see COPYING for details
 '''
 
-from pr0ntools import pimage
-from pr0ntools.pimage import PImage
+from pr0nmap import pimage
+from pr0nmap import tile_name
 
 import sys 
 import os.path
@@ -22,11 +22,13 @@ import time
 # rarely used and PIL seems to have bugs
 PALETTES = bool(os.getenv('PR0N_PALETTES', '0'))
 
+'''
 def get_fn(basedir, row, col, im_ext='.jpg'):
     return '%s/y%03d_x%03d%s' % (basedir, row, col, im_ext)
 
 def get_fn_level(basedir, level, row, col, im_ext='.jpg'):
     return '%s/%d/y%03d_x%03d%s' % (basedir, level, row, col, im_ext)
+'''
 
 def calc_max_level_from_image(image, zoom_factor=None):
     return calc_max_level(image.height(), image.width(), zoom_factor)
@@ -52,9 +54,11 @@ def calc_max_level(height, width, zoom_factor=None):
 Take a single large image and break it into tiles
 '''
 class ImageTiler(object):
-    def __init__(self, pim, dst_dir, tw=250, th=250, im_ext='.jpg'):
+    def __init__(self, pim, level, dst_dir, tw=250, th=250, im_ext='.jpg', get_tile_name=None):
         self.verbose = False
         self.pim = pim
+        self.level = level
+        self.get_tile_name = get_tile_name
         self.progress_inc = 0.10
         
         self.x0 = 0
@@ -67,18 +71,13 @@ class ImageTiler(object):
         self.dst_dir = dst_dir
 
         self.im_ext = im_ext
-        
-    # FIXME / TODO: this isn't the google reccomended naming scheme, look into that more    
-    # part of it was that I wanted them to sort nicely in file list view
-    def get_name(self, row, col):
-        return '%s/y%03d_x%03d%s' % (self.dst_dir, row, col, self.im_ext)
-        
+
     def make_tile(self, x, y, row, col):
         xmin = x
         ymin = y
         xmax = min(xmin + self.tw, self.x1)
         ymax = min(ymin + self.th, self.y1)
-        nfn = self.get_name(row, col)
+        nfn = self.get_tile_name(self.dst_dir, self.level, row, col, self.im_ext)
 
         #if self.verbose:
         #print '%s: (x %d:%d, y %d:%d)' % (nfn, xmin, xmax, ymin, ymax)
@@ -154,9 +153,11 @@ class TWorker(object):
         self.qo.put((self.ti, event, args))
 
     def task_subtile(self, val):
-        dst_dir, dst_row, dst_cols, src_dir = val
+        dst_basedir, dst_get_tile_name, dst_row, dst_cols, src_basedir, src_get_tile_name, src_level = val
         src_rowb = 2 * dst_row
-        
+        src_get_tile_name = tile_name.mk_get_tile_name(src_get_tile_name)
+        dst_get_tile_name = tile_name.mk_get_tile_name(dst_get_tile_name)
+
         # Workers are given 1 output row (2 input rows) at a time
         for dst_col in xrange(dst_cols):
             src_colb = 2 * dst_col
@@ -172,14 +173,14 @@ class TWorker(object):
                 ]
             for src_col in xrange(src_colb, src_colb + 2):
                 for src_row in xrange(src_rowb, src_rowb + 2):
-                    fn = get_fn(src_dir, src_row, src_col, im_ext=self.im_ext)
+                    fn = src_get_tile_name(src_basedir, src_level, src_row, src_col, self.im_ext)
                     src_img_fns[src_row - src_rowb][src_col - src_colb] = fn if os.path.exists(fn) else None
-            
+
             img_full = pimage.from_fns(src_img_fns,
                     tw=self.tw, th=self.th)
             #img_full = pimage.im_reload(img_full)
             img_scaled = pimage.rescale(img_full, 0.5, filt=Image.ANTIALIAS)
-            dst_fn = get_fn(dst_dir, dst_row, dst_col, im_ext=self.im_ext)
+            dst_fn = dst_get_tile_name(dst_basedir, src_level - 1, dst_row, dst_col, self.im_ext)
             img_scaled.save(dst_fn)
     
     def start(self):
@@ -217,9 +218,10 @@ Creates smaller tiles from source tiles
 '''
 class Tiler(object):
     def __init__(self, rows, cols, src_dir, max_level, min_level=0, dst_basedir=None, threads=1, pim=None,
-            tw=250, th=250, im_ext='.jpg'):
+            tw=250, th=250, im_ext='.jpg', get_tile_name=None):
         self.src_dir = src_dir
         self.pim = pim
+        self.get_tile_name = get_tile_name
         
         self.verbose = False
         self.cp_lmax = True
@@ -295,12 +297,15 @@ class Tiler(object):
         if allw:
             self.workers = None
 
-    def subtile(self, level, dst_dir, src_dir):
+    def subtile(self, dst_level,
+                src_basedir, src_get_tile_name,
+                dst_basedir, dst_get_tile_name):
         '''Subtile from previous level'''
-        
+        src_level = dst_level + 1
+
         # Prepare a new image coordinate map so we can form the next tile set
-        src_rows, src_cols = self.rcs[level + 1]
-        dst_rows, dst_cols = self.rcs[level]
+        src_rows, src_cols = self.rcs[dst_level + 1]
+        dst_rows, dst_cols = self.rcs[dst_level]
         
         print 'Shrink by %0.1f: cols %s => %s, rows %s => %s' % (self.zoom_factor,
                 src_cols, dst_cols,
@@ -352,8 +357,9 @@ class Tiler(object):
                 idle = False
                 worker = self.workers[self.wopen.pop()]
                 worker.submit('subtile',
-                    (dst_dir, dst_row, dst_cols,
-                    src_dir))
+                    (dst_basedir, tile_name.str_get_tile_name(dst_get_tile_name),
+                    dst_row, dst_cols,
+                    src_basedir, tile_name.str_get_tile_name(src_get_tile_name), src_level))
             
             if idle:
                 # Couldn't find something to do
@@ -364,14 +370,15 @@ class Tiler(object):
             print 'Shrinking the world for future rounds'
 
     def run_src_dir(self):
-        for level in xrange(self.max_level, self.min_level - 1, -1):
+        for dst_level in xrange(self.max_level, self.min_level - 1, -1):
             print
             print '************'
-            print 'Zoom level %d' % level
-            dst_dir = '%s/%d' % (self.dst_basedir, level)
+            print 'Zoom level %d' % dst_level
+            dst_dir = '%s/%d' % (self.dst_basedir, dst_level)
             
             # For the first level we may just copy things over
-            if level == self.max_level:
+            if dst_level == self.max_level:
+                assert 0, 'fixme: file name mismatch'
                 src_dir = self.src_dir
                 if self.cp_lmax:
                     print 'Source: direct copy %s => %s' % (src_dir, dst_dir)
@@ -383,33 +390,30 @@ class Tiler(object):
             # Additional levels we take the image coordinate map and shrink
             else:
                 print 'Source: tiles'
-                src_dir = '%s/%d' % (self.dst_basedir, level + 1)
-                if not os.path.exists(dst_dir):
-                    os.mkdir(dst_dir)
-                self.subtile(level, dst_dir, src_dir)
+                self.subtile(dst_level,
+                             self.dst_basedir, self.get_tile_name,
+                             self.dst_basedir, self.get_tile_name)
     
     def run_pim(self):
-        for level in xrange(self.max_level, self.min_level - 1, -1):
+        for dst_level in xrange(self.max_level, self.min_level - 1, -1):
             print
             print '************'
-            print 'Zoom level %d' % level
-            dst_dir = '%s/%d' % (self.dst_basedir, level)
-            if not os.path.exists(dst_dir):
-                os.mkdir(dst_dir)
+            print 'Zoom level %d' % dst_level
             
             # For the first level slice up source
             # Used to do all levels but it would result in OOM crash on large images
             # Plus only base level needs needs quality
-            if level == self.max_level:
+            if dst_level == self.max_level:
                 print 'Source: single image'
                 pim = self.pim
-                tiler = ImageTiler(pim, dst_dir, tw=self.tw, th=self.th, im_ext=self.im_ext)
+                tiler = ImageTiler(pim, dst_level, self.dst_basedir, tw=self.tw, th=self.th, im_ext=self.im_ext, get_tile_name=self.get_tile_name)
                 tiler.run()
             # Additional levels we take the image coordinate map and shrink
             else:
                 print 'Source: tiles'
-                src_dir = '%s/%d' % (self.dst_basedir, level + 1)
-                self.subtile(level, dst_dir, src_dir)
+                self.subtile(dst_level,
+                             self.dst_basedir, self.get_tile_name,
+                             self.dst_basedir, self.get_tile_name)
 
     def run(self):
         try:

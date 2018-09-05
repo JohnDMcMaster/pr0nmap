@@ -5,7 +5,9 @@ pre-stitched means non-overlapping
 They can be either a single large input image or the bottom level tiles
 '''
 
-from pr0nmap.map import Map, ImageMapSource, TileMapSource
+from pr0nmap.map import ImageMapSource, TileMapSource
+from pr0nmap.gmap import GMap
+from pr0nmap.groupxiv import GroupXIV
 
 import argparse        
 import multiprocessing
@@ -15,8 +17,6 @@ import re
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate Google Maps code from image file(s)')
     parser.add_argument('images_in', nargs='+', help='image file or dir in')
-    parser.add_argument('--level-min', type=int, default=0, help='Minimum zoom level')
-    parser.add_argument('--level-max', type=int, default=None, help='Maximum zoom level')
     parser.add_argument('--out', '-o', default=None, help='Output directory')
     parser.add_argument('--js-only', action="store_true", dest="js_only", default=False, help='No tiles, only JavaScript')
     parser.add_argument('--skip-missing', action="store_true", dest="skip_missing", default=False, help='Skip missing tiles')
@@ -25,6 +25,7 @@ if __name__ == "__main__":
     parser.add_argument('--title', dest="title", help='Set title.  Default: SiMap: <project name>')
     parser.add_argument('--copyright', '-c', help='Set copyright message (default: none)')
     parser.add_argument('--threads', type=int, default= multiprocessing.cpu_count())
+    parser.add_argument('--target', choices=['gmap', 'groupxiv'], default='groupxiv', help='')
     args = parser.parse_args()
 
     for image_in in args.images_in:
@@ -56,22 +57,25 @@ if __name__ == "__main__":
                 if m:
                     out_dir = m.group(3)
                     print 'Auto-naming output file for sipr0n: %s' % out_dir
-    
-        m = Map(source, args.copyright)
-        if args.title_name:
-            m.page_title = "SiMap: %s" % args.title_name
-        if args.title:
-            m.page_title = args.title
-        m.min_level = args.level_min
-        m.max_level = args.level_max
-        m.js_only = args.js_only
-        m.skip_missing = args.skip_missing
-        
+
         if not out_dir:
             out_dir = "map"
-        m.out_dir = out_dir
-        
         if not im_ext:
             im_ext = '.jpg'
+
+        title = args.title
+        if args.title_name:
+            title = "SiMap: %s" % args.title_name
+
+        if args.target == 'gmap':
+            m = GMap(source, args.copyright)
+        else:
+            m = GroupXIV(source, args.copyright)
+
+        m.set_title(title)
+        m.set_js_only(args.js_only)
+        m.set_skip_missing(args.skip_missing)
+        m.set_out_dir(out_dir)
         m.set_im_ext(im_ext)
-        m.generate()
+
+        m.run()
