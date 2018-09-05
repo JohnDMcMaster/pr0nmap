@@ -8,13 +8,9 @@ They can be either a single large input image or the bottom level tiles
 from pr0nmap.map import Map, ImageMapSource, TileMapSource
 
 import argparse        
-import datetime
 import multiprocessing
 import os
 import re
-
-std_c_mc = '&copy;%d John McMaster, CC BY' % datetime.datetime.now().year
-std_c_dig = '&copy;%d Digshadow, CC BY' % datetime.datetime.now().year
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate Google Maps code from image file(s)')
@@ -28,18 +24,10 @@ if __name__ == "__main__":
     parser.add_argument('--name', dest="title_name", help='SiMap: <name> title')
     parser.add_argument('--title', dest="title", help='Set title.  Default: SiMap: <project name>')
     parser.add_argument('--copyright', '-c', help='Set copyright message (default: none)')
-    parser.add_argument('--c-mc', '-M', action='store_true', help='Set copyright "%s"' % std_c_mc)
-    parser.add_argument('--c-dig', '-D', action='store_true', help='Set copyright "%s"' % std_c_dig)
     parser.add_argument('--threads', type=int, default= multiprocessing.cpu_count())
     args = parser.parse_args()
 
     for image_in in args.images_in:
-        if args.c_mc:
-            args.copyright = std_c_mc
-        
-        if args.c_dig:
-            args.copyright = std_c_dig
-    
         im_ext = args.out_extension
         out_dir = args.out
     
