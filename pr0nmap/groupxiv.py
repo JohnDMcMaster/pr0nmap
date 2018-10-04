@@ -29,7 +29,7 @@ def write_js(fn,
 <body>
     <div id="viewer"></div>
     <script>
-    initViewer({"scale": null, "layers": [{"imageSize": %s, "tileExt": "%s", "width": %u, "height": %u, "URL": "l1", "tileSize": %u, "name": "%s"}], "name": "%s", "name_raw": "%s", "copyright": "%s"});
+    initViewer({"tilesAlignedTopLeft": true, "scale": null, "layers": [{"imageSize": %s, "tileExt": "%s", "width": %u, "height": %u, "URL": "l1", "tileSize": %u, "name": "%s"}], "name": "%s", "name_raw": "%s", "copyright": "%s"});
     </script>
 </body>
 </html>
