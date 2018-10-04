@@ -1,9 +1,22 @@
 import os
+import math
 
 def write_js(fn,
              width, height, tile_size, layer_name, chip_name, chip_name_raw=None, copyright=None,
              tile_ext='.jpg',
-             url_base="http://siliconpr0n.org/lib/groupXIV/36"):
+             url_base="https://siliconpr0n.org/lib/groupXIV/36",
+             image_size=None):
+    if image_size is None:
+        # Round up to next power 2 tile size on largest dimension
+        tiles_max = float(max(width, height)) / tile_size
+        square = int(math.ceil(math.log(tiles_max, 2)))
+        image_size = (2**square) * tile_size
+        if 0:
+            print('tiles: %0.1f' % tiles_max)
+            print('square:%u' % square)
+            print('image_size:%u' % image_size)
+            import sys; sys.exit(0)
+
     open(fn, 'w').write('''\
 <!DOCTYPE html>
 <html>
@@ -16,11 +29,11 @@ def write_js(fn,
 <body>
     <div id="viewer"></div>
     <script>
-    initViewer({"scale": null, "layers": [{"imageSize": 4096, "tileExt": "%s", "width": %u, "height": %u, "URL": "l1", "tileSize": %u, "name": "%s"}], "name": "%s", "name_raw": "%s", "copyright": "%s"});
+    initViewer({"scale": null, "layers": [{"imageSize": %s, "tileExt": "%s", "width": %u, "height": %u, "URL": "l1", "tileSize": %u, "name": "%s"}], "name": "%s", "name_raw": "%s", "copyright": "%s"});
     </script>
 </body>
 </html>
-''' % (url_base, url_base, tile_ext, width, height, tile_size, layer_name, chip_name, chip_name_raw, copyright))
+''' % (url_base, url_base, image_size, tile_ext, width, height, tile_size, layer_name, chip_name, chip_name_raw, copyright))
 
 class GroupXIV:
     def __init__(self, source, copyright_=None):
@@ -59,13 +72,19 @@ class GroupXIV:
     # part of it was that I wanted them to sort nicely in file list view
     @staticmethod
     def get_tile_name(dst_dir, level, row, col, im_ext):
+        level += 1
+
         zoom_dir = '%s/%s' % (dst_dir, level)
-        if not os.path.exists(zoom_dir):
+        try:
             os.mkdir(zoom_dir)
+        except OSError:
+            pass
 
         x_dir = '%s/%u' % (zoom_dir, col)
-        if not os.path.exists(x_dir):
+        try:
             os.mkdir(x_dir)
+        except OSError:
+            pass
 
         return '%s/%u%s' % (x_dir, row, im_ext)
 
