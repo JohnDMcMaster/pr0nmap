@@ -27,7 +27,8 @@ def parse_html(fn):
             copyright = m.group(1)
 
     if is_gmap:
-        assert chip_name
+        if not chip_name:
+            chip_name = '???'
         return layer_name, chip_name, copyright
     else:
         return None
