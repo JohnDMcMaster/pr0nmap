@@ -39,9 +39,11 @@ def calc_max_level(height, width, zoom_factor=None):
     '''
     Calculate such that max level is a nice screen size
     Lets be generous for small viewers...especially considering limitations of mobile devices
+    Originally I was doing based on screen reoslution, but think XIV wants 2x2 max at min level
     '''
-    fit_width = 640
-    fit_height = 480
+    ts = 250
+    fit_width = ts * 2
+    fit_height = ts * 2
     
     width_levels = math.ceil(math.log(width, zoom_factor) - math.log(fit_width, zoom_factor))
     height_levels = math.ceil(math.log(height, zoom_factor) - math.log(fit_height, zoom_factor))
