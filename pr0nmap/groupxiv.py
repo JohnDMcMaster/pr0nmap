@@ -4,7 +4,7 @@ import math
 def write_js(fn,
              width, height, tile_size, layer_name, chip_name, chip_name_raw=None, copyright=None,
              tile_ext='.jpg',
-             url_base="https://siliconpr0n.org/lib/groupXIV/36",
+             url_base="https://siliconpr0n.org/lib/groupXIV/stable",
              image_size=None):
     if image_size is None:
         # Round up to next power 2 tile size on largest dimension
@@ -23,8 +23,8 @@ def write_js(fn,
   <head>
     <title>Loading...</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script type="text/javascript" src="%s/public_html/bundle/groupxiv.js"></script>
-    <link type="text/css" rel="stylesheet" href="%s/public_html/bundle/groupxiv.css">
+    <script type="text/javascript" src="%s/groupxiv.js"></script>
+    <link type="text/css" rel="stylesheet" href="%s/groupxiv.css">
 </head>
 <body>
     <div id="viewer"></div>
