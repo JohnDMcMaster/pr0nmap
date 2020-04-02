@@ -9,6 +9,7 @@ Licensed under a 2 clause BSD license, see COPYING for details
 '''
 
 from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
 import os
 
 # needed for PNG support

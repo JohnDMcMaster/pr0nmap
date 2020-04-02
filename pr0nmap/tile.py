@@ -11,6 +11,7 @@ from pr0nmap import tile_name
 import sys 
 import os.path
 from PIL import Image
+Image.MAX_IMAGE_PIXELS = None
 import shutil
 import math
 import Queue
