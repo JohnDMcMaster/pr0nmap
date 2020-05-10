@@ -5,12 +5,13 @@ import re
 from shutil import copyfile
 from pr0nmap.groupxiv import write_js
 
+
 def parse_html(fn):
     is_gmap = False
     layer_name = '???'
     chip_name = '???'
     copyright = ''
-    
+
     for l in open(fn):
         is_gmap |= bool(re.search(r'maps.google.com/maps/api', l))
 
@@ -91,9 +92,17 @@ def run():
     if copyright:
         chip_name += ', &copy;%s' % copyright
 
-    write_js('index.html',
-                 width, height, tile_size, layer_name, chip_name, chip_name_raw, copyright,
-                 tile_ext='.jpg')
+    write_js(
+        'index.html',
+        width,
+        height,
+        tile_size,
+        layer_name,
+        chip_name,
+        chip_name_raw,
+        copyright,
+        tile_ext='.jpg')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plot')

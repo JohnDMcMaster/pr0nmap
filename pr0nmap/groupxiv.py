@@ -1,8 +1,15 @@
 import os
 import math
 
+
 def write_js(fn,
-             width, height, tile_size, layer_name, chip_name, chip_name_raw=None, copyright=None,
+             width,
+             height,
+             tile_size,
+             layer_name,
+             chip_name,
+             chip_name_raw=None,
+             copyright=None,
              tile_ext='.jpg',
              url_base="https://siliconpr0n.org/lib/groupXIV/stable",
              image_size=None):
@@ -15,7 +22,8 @@ def write_js(fn,
             print('tiles: %0.1f' % tiles_max)
             print('square:%u' % square)
             print('image_size:%u' % image_size)
-            import sys; sys.exit(0)
+            import sys
+            sys.exit(0)
 
     open(fn, 'w').write('''\
 <!DOCTYPE html>
@@ -33,13 +41,15 @@ def write_js(fn,
     </script>
 </body>
 </html>
-''' % (url_base, url_base, image_size, tile_ext, width, height, tile_size, layer_name, chip_name, chip_name_raw, copyright))
+''' % (url_base, url_base, image_size, tile_ext, width, height, tile_size,
+       layer_name, chip_name, chip_name_raw, copyright))
+
 
 class GroupXIV:
     def __init__(self, source, copyright_=None):
         self.source = source
         self.copyright = copyright_
-        
+
         self.title = None
         self.out_dir = 'map'
         self.max_level = None
@@ -67,8 +77,8 @@ class GroupXIV:
     def set_im_ext(self, s):
         self.im_ext = s
         self.source.im_ext = s
-    
-    # FIXME / TODO: this isn't the google reccomended naming scheme, look into that more    
+
+    # FIXME / TODO: this isn't the google reccomended naming scheme, look into that more
     # part of it was that I wanted them to sort nicely in file list view
     @staticmethod
     def get_tile_name(dst_dir, level, row, col, im_ext):
@@ -95,9 +105,15 @@ class GroupXIV:
         if not os.path.exists(self.out_dir):
             os.mkdir(self.out_dir)
 
-        write_js('%s/index.html' % self.out_dir,
-             width=self.source.width(), height=self.source.height(), tile_size=self.tile_size, layer_name='???', chip_name='???', copyright=None,
-             tile_ext='.jpg')
+        write_js(
+            '%s/index.html' % self.out_dir,
+            width=self.source.width(),
+            height=self.source.height(),
+            tile_size=self.tile_size,
+            layer_name='???',
+            chip_name='???',
+            copyright=None,
+            tile_ext='.jpg')
 
     def run(self):
         '''
@@ -113,4 +129,8 @@ class GroupXIV:
             print
             print
 
-            self.source.generate_tiles(self.max_level, self.min_level, self.get_tile_name, dst_basedir='%s/l1-tiles' % self.out_dir)
+            self.source.generate_tiles(
+                self.max_level,
+                self.min_level,
+                self.get_tile_name,
+                dst_basedir='%s/l1-tiles' % self.out_dir)
