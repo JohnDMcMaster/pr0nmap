@@ -46,9 +46,9 @@ def write_js(fn,
 
 
 class GroupXIV:
-    def __init__(self, source, copyright_=None):
+    def __init__(self, source, copyright=None):
         self.source = source
-        self.copyright = copyright_
+        self.copyright = copyright
 
         self.title = None
         self.out_dir = 'map'
@@ -112,7 +112,7 @@ class GroupXIV:
             tile_size=self.tile_size,
             layer_name='???',
             chip_name='???',
-            copyright=None,
+            copyright=self.copyright,
             tile_ext='.jpg')
 
     def run(self):

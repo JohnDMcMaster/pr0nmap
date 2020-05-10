@@ -91,9 +91,9 @@ if __name__ == "__main__":
             title = "SiMap: %s" % args.title_name
 
         if args.target == 'gmap':
-            m = GMap(source, args.copyright)
+            m = GMap(source, copyright=args.copyright)
         else:
-            m = GroupXIV(source, args.copyright)
+            m = GroupXIV(source, copyright=args.copyright)
 
         m.set_title(title)
         m.set_js_only(args.js_only)

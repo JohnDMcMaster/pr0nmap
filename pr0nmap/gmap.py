@@ -2,9 +2,9 @@ import os
 
 
 class GMap:
-    def __init__(self, source, copyright_=None):
+    def __init__(self, source, copyright=None):
         self.source = source
-        self.copyright = copyright_
+        self.copyright = copyright
 
         self.page_title = None
         # Consider mangling this pased on the image name
