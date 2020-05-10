@@ -18,6 +18,16 @@ import Queue
 import multiprocessing
 import traceback
 import time
+import errno
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
 
 # needed for PNG support
 # rarely used and PIL seems to have bugs
@@ -372,24 +382,62 @@ class Tiler(object):
         if self.verbose:
             print 'Shrinking the world for future rounds'
 
+    def get_tle_name_pr0nts(self, root_dir, row, col, im_ext):
+        return os.path.join(root_dir, "y%03u_x%03u%s" % (row, col, im_ext))
+
+    def copy_max_dir(self, dst_level):
+        #assert 0, 'fixme: file name mismatch'
+        rows, cols = self.rcs[dst_level]
+
+        if self.cp_lmax:
+            skips = set()
+            print 'Source: direct copy rejigger %s => %s' % (self.src_dir, self.dst_basedir)
+            # shutil.copytree(self.src_dir, self.dst_basedir)
+            fnref = None
+            for x in xrange(cols):
+                for y in xrange(rows):
+                    src_fn = self.get_tle_name_pr0nts(self.src_dir, y, x, self.im_ext)
+                    dst_fn = self.get_tile_name(self.dst_basedir, dst_level, y, x, self.im_ext)
+                    mkdir_p(os.path.dirname(dst_fn))
+                    try:
+                        shutil.copyfile(src_fn, dst_fn)
+                        if not fnref:
+                            print("Ex: %s => %s" % (src_fn, dst_fn))
+                        fnref = src_fn
+                    except IOError as e:
+                        skips.add((x, y, dst_fn))
+            print("Skip %s" % len(skips))
+            # must be done after as it may be hard to get a reference image
+            if len(skips):
+                print("Creating fill image...")
+                imref = Image.open(fnref)
+                width, height = imref.size
+                imblank = Image.new(imref.mode, (imref.size))
+                """
+                # noise image
+                for y in range(height):
+                    for x in range(width):
+                        c = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+                        imblank.putpixel((x, y), c)
+                """
+                print("Applying fill...")
+                for (x, y, dst_fn) in skips:
+                    imblank.save(dst_fn)
+                print("Filled missing images")
+        else:
+            # explicitly load and save images to clean dir, same jpg format
+            # a bit more paranoid but questionable utility still
+            raise Exception()
+
     def run_src_dir(self):
         for dst_level in xrange(self.max_level, self.min_level - 1, -1):
             print
             print '************'
             print 'Zoom level %d' % dst_level
-            dst_dir = '%s/%d' % (self.dst_basedir, dst_level)
             
             # For the first level we may just copy things over
             if dst_level == self.max_level:
-                assert 0, 'fixme: file name mismatch'
-                src_dir = self.src_dir
-                if self.cp_lmax:
-                    print 'Source: direct copy %s => %s' % (src_dir, dst_dir)
-                    shutil.copytree(src_dir, dst_dir)
-                else:
-                    # explicitly load and save images to clean dir, same jpg format
-                    # a bit more paranoid but questionable utility still
-                    raise Exception()
+                self.copy_max_dir(dst_level)
             # Additional levels we take the image coordinate map and shrink
             else:
                 print 'Source: tiles'
