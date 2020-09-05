@@ -110,8 +110,8 @@ class GroupXIV:
             width=self.source.width(),
             height=self.source.height(),
             tile_size=self.tile_size,
-            layer_name='???',
-            chip_name='???',
+            layer_name="%s, %s" % (self.source.get_name(), self.copyright),
+            chip_name="???",
             copyright=self.copyright,
             tile_ext='.jpg')
 
