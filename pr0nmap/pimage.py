@@ -1,11 +1,5 @@
 '''
-This file is part of pr0ntools
-Image utility file
-http://effbot.org/imagingbook/image.htm
-http://pillow.readthedocs.io/en/3.1.x/reference/ImagePalette.html
-
-Copyright 2010 John McMaster <JohnDMcMaster@gmail.com>
-Licensed under a 2 clause BSD license, see COPYING for details
+TODO: get rid of this file
 '''
 
 from PIL import Image

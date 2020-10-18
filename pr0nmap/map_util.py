@@ -1,5 +1,5 @@
-from pr0ntools.stitch.image_coordinate_map import ImageCoordinateMap
-from pr0ntools.pimage import PImage
+from pr0nmap.image_coordinate_map import ImageCoordinateMap
+from pr0nmap.pimage import PImage
 import os
 import shutil
 
