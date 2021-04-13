@@ -20,7 +20,9 @@ def parse_image_name(fn):
     fnbase = os.path.basename(fn)
     m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).jpg', fnbase)
     if not m:
-        raise Exception("Bad file name: %s" % (fn, ))
+        raise Exception(
+            "Non-confirming file name (need vendor_chipid_flavor.jpg): %s" %
+            (fn, ))
     vendor = m.group(1)
     chipid = m.group(2)
     flavor = m.group(3)
@@ -73,21 +75,7 @@ if __name__ == "__main__":
             source = TileMapSource(image_in, threads=args.threads)
         else:
             print('Working on singleinput image %s' % image_in)
-            source = ImageMapSource(image_in, threads=args.threads)
-            if not im_ext:
-                im_ext = '.' + image_in.split('.')[-1]
-            # Do auto-magic renaming for standr named die on sipr0n
-            '''
-            Always in form:
-            <vendor>_<chip>_<dataset>.<ext>
-            
-            Typically something like
-            <vendor>_<chip>_<layer>_<mag>.jpg
-            ex: mos_6581r2_mz_mit20x.jpg
-            
-            But also variations
-            ex: mos_6581r2_vec-a.png
-            '''
+            # Do auto-magic renaming for standard named die on sipr0n
             if not out_dir:
                 # keep in sync with sipr0n/simapper.py
                 if re.match(r'single/.*', image_in):
@@ -95,6 +83,9 @@ if __name__ == "__main__":
                         image_in)
                     out_dir = flavor
                     print('Auto-naming output file for sipr0n: %s' % out_dir)
+            if not im_ext:
+                im_ext = '.' + image_in.split('.')[-1]
+            source = ImageMapSource(image_in, threads=args.threads)
 
         if not out_dir:
             out_dir = "map"
