@@ -74,11 +74,12 @@ if __name__ == "__main__":
             print('Working on directory of max zoomed tiles')
             source = TileMapSource(image_in, threads=args.threads)
         else:
-            print('Working on singleinput image %s' % image_in)
+            print('Working on single input image %s' % image_in)
             # Do auto-magic renaming for standard named die on sipr0n
             if not out_dir:
                 # keep in sync with sipr0n/simapper.py
-                if re.match(r'single/.*', image_in):
+                sparts = image_in.split("/")
+                if len(sparts) > 1 and sparts[-2] == "single":
                     _fnbase, _vendor, _chipid, flavor = parse_image_name(
                         image_in)
                     out_dir = flavor
