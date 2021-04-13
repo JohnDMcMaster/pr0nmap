@@ -284,8 +284,8 @@ siMap.setOptions({
             print
             print
 
-            self.source.generate_tiles(
-                self.max_level,
-                self.min_level,
-                self.get_tile_name,
-                dst_basedir='%s/tiles_out' % self.out_dir)
+            self.source.generate_tiles(self.max_level,
+                                       self.min_level,
+                                       self.get_tile_name,
+                                       dst_basedir='%s/tiles_out' %
+                                       self.out_dir)

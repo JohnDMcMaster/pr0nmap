@@ -166,13 +166,13 @@ Only support tiled workers since unclear if full image can/should be parallelize
 
 class TWorker(object):
     def __init__(
-            self,
-            ti,
-            qo,
-            im_ext,
-            # tile width/height
-            tw,
-            th):
+        self,
+        ti,
+        qo,
+        im_ext,
+        # tile width/height
+        tw,
+        th):
         self.process = multiprocessing.Process(target=self.run)
         self.ti = ti
 
@@ -323,8 +323,11 @@ class Tiler(object):
         for wi in xrange(self.threads):
             if self.verbose:
                 print 'Bringing up W%02d' % wi
-            w = TWorker(
-                wi, self.qi, im_ext=self.im_ext, tw=self.tw, th=self.th)
+            w = TWorker(wi,
+                        self.qi,
+                        im_ext=self.im_ext,
+                        tw=self.tw,
+                        th=self.th)
             self.workers.append(w)
             w.start()
             self.wopen.add(wi)
@@ -507,14 +510,13 @@ class Tiler(object):
             if dst_level == self.max_level:
                 print 'Source: single image'
                 pim = self.pim
-                tiler = ImageTiler(
-                    pim,
-                    dst_level,
-                    self.dst_basedir,
-                    tw=self.tw,
-                    th=self.th,
-                    im_ext=self.im_ext,
-                    get_tile_name=self.get_tile_name)
+                tiler = ImageTiler(pim,
+                                   dst_level,
+                                   self.dst_basedir,
+                                   tw=self.tw,
+                                   th=self.th,
+                                   im_ext=self.im_ext,
+                                   get_tile_name=self.get_tile_name)
                 tiler.run()
             # Additional levels we take the image coordinate map and shrink
             else:

@@ -105,15 +105,15 @@ class GroupXIV:
         if not os.path.exists(self.out_dir):
             os.mkdir(self.out_dir)
 
-        write_js(
-            '%s/index.html' % self.out_dir,
-            width=self.source.width(),
-            height=self.source.height(),
-            tile_size=self.tile_size,
-            layer_name="%s, %s" % (self.source.get_name(), self.copyright),
-            chip_name="???",
-            copyright=self.copyright,
-            tile_ext='.jpg')
+        write_js('%s/index.html' % self.out_dir,
+                 width=self.source.width(),
+                 height=self.source.height(),
+                 tile_size=self.tile_size,
+                 layer_name="%s, %s" %
+                 (self.source.get_name(), self.copyright),
+                 chip_name="???",
+                 copyright=self.copyright,
+                 tile_ext='.jpg')
 
     def run(self):
         '''
@@ -129,8 +129,8 @@ class GroupXIV:
             print
             print
 
-            self.source.generate_tiles(
-                self.max_level,
-                self.min_level,
-                self.get_tile_name,
-                dst_basedir='%s/l1-tiles' % self.out_dir)
+            self.source.generate_tiles(self.max_level,
+                                       self.min_level,
+                                       self.get_tile_name,
+                                       dst_basedir='%s/l1-tiles' %
+                                       self.out_dir)

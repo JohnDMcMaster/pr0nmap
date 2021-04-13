@@ -59,17 +59,16 @@ class ImageMapSource(MapSource):
         cols = int(math.ceil(1.0 * self.pim.width() / self.tw))
         print '%dw x %dh => %dc x %dr' % (self.pim.width(), self.pim.height(),
                                           cols, rows)
-        gen = Tiler(
-            rows,
-            cols,
-            None,
-            max_level,
-            min_level,
-            dst_basedir=dst_basedir,
-            threads=self.threads,
-            pim=self.pim,
-            im_ext=self.im_ext,
-            get_tile_name=get_tile_name)
+        gen = Tiler(rows,
+                    cols,
+                    None,
+                    max_level,
+                    min_level,
+                    dst_basedir=dst_basedir,
+                    threads=self.threads,
+                    pim=self.pim,
+                    im_ext=self.im_ext,
+                    get_tile_name=get_tile_name)
 
         gen.run()
 
@@ -115,15 +114,14 @@ class TileMapSource(MapSource):
 
     def generate_tiles(self, max_level, min_level, get_tile_name, dst_basedir):
         print 'From multi tiles'
-        gen = Tiler(
-            self.map.height(),
-            self.map.width(),
-            self.src_dir,
-            max_level,
-            min_level,
-            dst_basedir=dst_basedir,
-            threads=self.threads,
-            pim=None,
-            im_ext=self.im_ext,
-            get_tile_name=get_tile_name)
+        gen = Tiler(self.map.height(),
+                    self.map.width(),
+                    self.src_dir,
+                    max_level,
+                    min_level,
+                    dst_basedir=dst_basedir,
+                    threads=self.threads,
+                    pim=None,
+                    im_ext=self.im_ext,
+                    get_tile_name=get_tile_name)
         gen.run()

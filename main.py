@@ -14,39 +14,54 @@ import multiprocessing
 import os
 import re
 
+
+# Keep pr0nmap/main.py and sipr0n/img2doku.py in sync
+def parse_image_name(fn):
+    fnbase = os.path.basename(fn)
+    m = re.match(r'([a-z0-9\-]+)_([a-z0-9\-]+)_(.*).jpg', fnbase)
+    if not m:
+        raise Exception("Bad file name: %s" % (fn, ))
+    vendor = m.group(1)
+    chipid = m.group(2)
+    flavor = m.group(3)
+    return (fnbase, vendor, chipid, flavor)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Generate Google Maps code from image file(s)')
     parser.add_argument('images_in', nargs='+', help='image file or dir in')
     parser.add_argument('--out', '-o', default=None, help='Output directory')
-    parser.add_argument(
-        '--js-only',
-        action="store_true",
-        dest="js_only",
-        default=False,
-        help='No tiles, only JavaScript')
-    parser.add_argument(
-        '--skip-missing',
-        action="store_true",
-        dest="skip_missing",
-        default=False,
-        help='Skip missing tiles')
+    parser.add_argument('--js-only',
+                        action="store_true",
+                        dest="js_only",
+                        default=False,
+                        help='No tiles, only JavaScript')
+    parser.add_argument('--skip-missing',
+                        action="store_true",
+                        dest="skip_missing",
+                        default=False,
+                        help='Skip missing tiles')
     parser.add_argument(
         '--out-extension',
         default=None,
         help='Select output image extension (and type), .jpg, .png, .tif, etc')
-    parser.add_argument(
-        '--name', dest="title_name", help='SiMap: <name> title')
-    parser.add_argument(
-        '--title',
-        dest="title",
-        help='Set title.  Default: SiMap: <project name>')
-    parser.add_argument(
-        '--copyright', '-c', help='Set copyright message (default: none)')
-    parser.add_argument(
-        '--threads', type=int, default=multiprocessing.cpu_count())
-    parser.add_argument(
-        '--target', choices=['gmap', 'groupxiv'], default='groupxiv', help='')
+    parser.add_argument('--name',
+                        dest="title_name",
+                        help='SiMap: <name> title')
+    parser.add_argument('--title',
+                        dest="title",
+                        help='Set title.  Default: SiMap: <project name>')
+    parser.add_argument('--copyright',
+                        '-c',
+                        help='Set copyright message (default: none)')
+    parser.add_argument('--threads',
+                        type=int,
+                        default=multiprocessing.cpu_count())
+    parser.add_argument('--target',
+                        choices=['gmap', 'groupxiv'],
+                        default='groupxiv',
+                        help='')
     args = parser.parse_args()
 
     for image_in in args.images_in:
@@ -57,7 +72,7 @@ if __name__ == "__main__":
             print('Working on directory of max zoomed tiles')
             source = TileMapSource(image_in, threads=args.threads)
         else:
-            print('Working on singe input image %s' % image_in)
+            print('Working on singleinput image %s' % image_in)
             source = ImageMapSource(image_in, threads=args.threads)
             if not im_ext:
                 im_ext = '.' + image_in.split('.')[-1]
@@ -74,11 +89,11 @@ if __name__ == "__main__":
             ex: mos_6581r2_vec-a.png
             '''
             if not out_dir:
-                m = re.match(
-                    r'single/([A-Za-z0-9]*)_([A-Za-z0-9\-]*)_(.*)\.(.*)',
-                    image_in)
-                if m:
-                    out_dir = m.group(3)
+                # keep in sync with sipr0n/simapper.py
+                if re.match(r'single/.*', image_in):
+                    _fnbase, _vendor, _chipid, flavor = parse_image_name(
+                        image_in)
+                    out_dir = flavor
                     print('Auto-naming output file for sipr0n: %s' % out_dir)
 
         if not out_dir:

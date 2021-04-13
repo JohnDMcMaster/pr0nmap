@@ -92,16 +92,15 @@ def run():
     if copyright:
         chip_name += ', &copy;%s' % copyright
 
-    write_js(
-        'index.html',
-        width,
-        height,
-        tile_size,
-        layer_name,
-        chip_name,
-        chip_name_raw,
-        copyright,
-        tile_ext='.jpg')
+    write_js('index.html',
+             width,
+             height,
+             tile_size,
+             layer_name,
+             chip_name,
+             chip_name_raw,
+             copyright,
+             tile_ext='.jpg')
 
 
 if __name__ == "__main__":
