@@ -82,7 +82,10 @@ if __name__ == "__main__":
                 if len(sparts) > 1 and sparts[-2] == "single":
                     _fnbase, _vendor, _chipid, flavor = parse_image_name(
                         image_in)
-                    out_dir = flavor
+                    # Normalize:
+                    # vendor/chipid/single/blah.jpg
+                    # single/blah.jpg
+                    out_dir = os.path.join(os.path.dirname(os.path.dirname(image_in)), flavor)
                     print('Auto-naming output file for sipr0n: %s' % out_dir)
             if not im_ext:
                 im_ext = '.' + image_in.split('.')[-1]
