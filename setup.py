@@ -33,7 +33,7 @@ for script in scripts:
 
 setup(
     name="pr0nmap",
-    version="1.0.0",
+    version="2.0.0",
     author="John McMaster",
     author_email='JohnDMcMaster@gmail.com',
     description=("siliconpr0n.org map generator."),
