@@ -53,12 +53,12 @@ class ImageMapSource(MapSource):
 
     def generate_tiles(self, max_level, min_level, get_tile_name, dst_basedir):
         # Generate tiles
-        print 'From single image in %s to dir %s' % (self.image_in,
-                                                     dst_basedir)
+        print('From single image in %s to dir %s' % (self.image_in,
+                                                     dst_basedir))
         rows = int(math.ceil(1.0 * self.pim.height() / self.th))
         cols = int(math.ceil(1.0 * self.pim.width() / self.tw))
-        print '%dw x %dh => %dc x %dr' % (self.pim.width(), self.pim.height(),
-                                          cols, rows)
+        print('%dw x %dh => %dc x %dr' % (self.pim.width(), self.pim.height(),
+                                          cols, rows))
         gen = Tiler(rows,
                     cols,
                     None,
@@ -75,7 +75,7 @@ class ImageMapSource(MapSource):
 
 class TileMapSource(MapSource):
     def __init__(self, dir_in, threads=1):
-        print 'TileMapSource()'
+        print('TileMapSource()')
         self.tw = 250
         self.th = 250
         self.threads = threads
@@ -95,7 +95,7 @@ class TileMapSource(MapSource):
         self.x_tiles = self.map.width()
         self.y_tiles = self.map.height()
 
-        print 'Tile canvas width %d, height %d' % (self.width(), self.height())
+        print('Tile canvas width %d, height %d' % (self.width(), self.height()))
 
         MapSource.__init__(self)
 
@@ -113,7 +113,7 @@ class TileMapSource(MapSource):
         return self.th * self.y_tiles
 
     def generate_tiles(self, max_level, min_level, get_tile_name, dst_basedir):
-        print 'From multi tiles'
+        print('From multi tiles')
         gen = Tiler(self.map.height(),
                     self.map.width(),
                     self.src_dir,

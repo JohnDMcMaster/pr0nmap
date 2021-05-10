@@ -259,7 +259,7 @@ siMap.setOptions({
             self.calc_max_level()
         js = self.get_js()
         js_filename = '%s/index.html' % self.out_dir
-        print 'Writing javascript to %s' % js_filename
+        print('Writing javascript to %s' % js_filename)
         open(js_filename, 'w').write(js)
 
         self.image = None
@@ -280,9 +280,9 @@ siMap.setOptions({
         # generate javascript
         self.gen_js()
         if not self.js_only:
-            print
-            print
-            print
+            print()
+            print()
+            print()
 
             self.source.generate_tiles(self.max_level,
                                        self.min_level,

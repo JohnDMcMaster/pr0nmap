@@ -27,8 +27,8 @@ class PImage:
             row_label_str = ''
             if row_label:
                 row_label_str = '%02d: ' % y
-            print row_label_str + self.debug_row_string(
-                y, char_limit, row_label_str)
+            print(row_label_str + self.debug_row_string(
+                y, char_limit, row_label_str))
 
     def debug_row_string(self, y, char_limit=None, row_label=None):
         if row_label is None:
@@ -114,7 +114,7 @@ class PImage:
         #print 'subimage: start.  x_min: %d: x_max: %d, y_min: %d, y_max: %d' % (x_min, x_max, y_min, y_max)
 
         if x_min < 0 or y_min < 0 or x_max < 0 or y_max < 0:
-            print x_min, y_min, x_max, y_max
+            print(x_min, y_min, x_max, y_max)
             raise Exception('out of bounds')
 
         # Did we truncate the whole image?
@@ -156,7 +156,7 @@ class PImage:
         try:
             return self.image.getpixel((x, y))
         except:
-            print 'bad pixel values, x: %d, y: %d' % (x, y)
+            print('bad pixel values, x: %d, y: %d' % (x, y))
             raise
 
     # The following are in case we change image mode
@@ -227,7 +227,7 @@ class PImage:
         '''
         I'm having difficulty dealing with anything paletted, so convert everything right off the bat
         '''
-        if not type(path) in (str, unicode):
+        if not type(path) in (str, str):
             raise Exception()
 
         img = Image.open(path)

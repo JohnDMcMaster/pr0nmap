@@ -14,7 +14,7 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = None
 import shutil
 import math
-import Queue
+import queue
 import multiprocessing
 import traceback
 import time
@@ -65,9 +65,9 @@ def calc_max_level(height, width, zoom_factor=None):
         math.log(height, zoom_factor) - math.log(fit_height, zoom_factor))
     max_level = int(max(width_levels, height_levels, 0))
     # Take the number of zoom levels required to fit the entire thing on screen
-    print 'Calc max zoom level for %d X %d screen: %d (wmax: %d lev / %d pix, hmax: %d lev / %d pix)' % (
+    print('Calc max zoom level for %d X %d screen: %d (wmax: %d lev / %d pix, hmax: %d lev / %d pix)' % (
         fit_width, fit_height, max_level, width_levels, width, height_levels,
-        height)
+        height))
     return max_level
 
 
@@ -142,19 +142,19 @@ class ImageTiler(object):
         col = 0
         next_progress = self.progress_inc
         processed = 0
-        n_images = len(range(self.x0, self.x1, self.tw)) * len(
-            range(self.y0, self.y1, self.th))
-        for x in xrange(self.x0, self.x1, self.tw):
+        n_images = len(list(range(self.x0, self.x1, self.tw))) * len(
+            list(range(self.y0, self.y1, self.th)))
+        for x in range(self.x0, self.x1, self.tw):
             row = 0
-            for y in xrange(self.y0, self.y1, self.th):
+            for y in range(self.y0, self.y1, self.th):
                 self.make_tile(x, y, row, col)
                 row += 1
                 processed += 1
                 if self.progress_inc:
                     cur_progress = 1.0 * processed / n_images
                     if cur_progress >= next_progress:
-                        print 'Progress: %02.2f%% %d / %d' % (
-                            cur_progress * 100, processed, n_images)
+                        print('Progress: %02.2f%% %d / %d' % (
+                            cur_progress * 100, processed, n_images))
                         next_progress += self.progress_inc
             col += 1
 
@@ -198,7 +198,7 @@ class TWorker(object):
         dst_get_tile_name = tile_name.mk_get_tile_name(dst_get_tile_name)
 
         # Workers are given 1 output row (2 input rows) at a time
-        for dst_col in xrange(dst_cols):
+        for dst_col in range(dst_cols):
             src_colb = 2 * dst_col
 
             # Collapse 2x2
@@ -210,8 +210,8 @@ class TWorker(object):
                 [None, None],
                 [None, None],
             ]
-            for src_col in xrange(src_colb, src_colb + 2):
-                for src_row in xrange(src_rowb, src_rowb + 2):
+            for src_col in range(src_colb, src_colb + 2):
+                for src_row in range(src_rowb, src_rowb + 2):
                     fn = src_get_tile_name(src_basedir, src_level, src_row,
                                            src_col, self.im_ext)
                     src_img_fns[src_row - src_rowb][
@@ -236,7 +236,7 @@ class TWorker(object):
         while self.running.is_set():
             try:
                 task, args = self.qi.get(True, 0.1)
-            except Queue.Empty:
+            except queue.Empty:
                 continue
 
             def task_subtile(args):
@@ -250,7 +250,7 @@ class TWorker(object):
             try:
                 taskers[task](args)
             except Exception as e:
-                print 'WARNING: got exception trying supertile %s' % str(task)
+                print('WARNING: got exception trying supertile %s' % str(task))
                 traceback.print_exc()
                 estr = traceback.format_exc()
                 self.complete('exception', (task, e, estr))
@@ -298,7 +298,7 @@ class Tiler(object):
         self.workers = None
 
         self.rcs = {}
-        for level in xrange(self.max_level, self.min_level - 1, -1):
+        for level in range(self.max_level, self.min_level - 1, -1):
             if rows == 0 or cols == 0:
                 raise Exception()
             self.rcs[level] = (rows, cols)
@@ -320,9 +320,9 @@ class Tiler(object):
         self.wopen = set()
         # Our input queue / worker output queue
         self.qi = multiprocessing.Queue()
-        for wi in xrange(self.threads):
+        for wi in range(self.threads):
             if self.verbose:
-                print 'Bringing up W%02d' % wi
+                print('Bringing up W%02d' % wi)
             w = TWorker(wi,
                         self.qi,
                         im_ext=self.im_ext,
@@ -337,22 +337,22 @@ class Tiler(object):
             return
 
         if self.verbose:
-            print 'Shutting down workers'
+            print('Shutting down workers')
         for worker in self.workers:
             worker.running.clear()
         if self.verbose:
-            print 'Waiting for workers to exit...'
+            print('Waiting for workers to exit...')
         allw = True
         for wi, worker in enumerate(self.workers):
             if worker is None:
                 continue
             worker.process.join(1)
             if worker.process.is_alive():
-                print '  W%d: failed to join' % wi
+                print('  W%d: failed to join' % wi)
                 allw = False
             else:
                 if self.verbose:
-                    print '  W%d: stopped' % wi
+                    print('  W%d: stopped' % wi)
                 self.workers[wi] = None
                 self.wopen.remove(wi)
         if allw:
@@ -367,15 +367,15 @@ class Tiler(object):
         src_rows, src_cols = self.rcs[dst_level + 1]
         dst_rows, dst_cols = self.rcs[dst_level]
 
-        print 'Shrink by %0.1f: cols %s => %s, rows %s => %s' % (
-            self.zoom_factor, src_cols, dst_cols, src_rows, dst_rows)
+        print('Shrink by %0.1f: cols %s => %s, rows %s => %s' % (
+            self.zoom_factor, src_cols, dst_cols, src_rows, dst_rows))
 
         next_progress = self.progress_inc
         done = 0
 
         # AttributeError: 'xrange' object has no attribute 'next'
         def dst_row_genf():
-            for x in xrange(dst_rows):
+            for x in range(dst_rows):
                 yield x
 
         dst_row_gen = dst_row_genf()
@@ -391,10 +391,10 @@ class Tiler(object):
             while True:
                 try:
                     wi, event, val = self.qi.get(False)
-                except Queue.Empty:
+                except queue.Empty:
                     break
                 if event != 'done':
-                    print event, val
+                    print(event, val)
                     raise Exception()
                 idle = False
                 self.wopen.add(wi)
@@ -402,15 +402,15 @@ class Tiler(object):
                 done += 1
                 progress = 1.0 * done / dst_rows
                 if self.progress_inc and progress >= next_progress:
-                    print 'Progress: %02.2f%% %d / %d' % (progress * 100, done,
-                                                          dst_rows)
+                    print('Progress: %02.2f%% %d / %d' % (progress * 100, done,
+                                                          dst_rows))
                     next_progress += self.progress_inc
 
             # More tasks to give?
             if dst_row_gen and len(self.wopen):
                 # Assign next task
                 try:
-                    dst_row = dst_row_gen.next()
+                    dst_row = next(dst_row_gen)
                 # Out of tasks?
                 except StopIteration:
                     dst_row_gen = None
@@ -431,7 +431,7 @@ class Tiler(object):
 
         # Next shrink will be on the previous tile set, not the original
         if self.verbose:
-            print 'Shrinking the world for future rounds'
+            print('Shrinking the world for future rounds')
 
     def get_tle_name_pr0nts(self, root_dir, row, col, im_ext):
         return os.path.join(root_dir, "y%03u_x%03u%s" % (row, col, im_ext))
@@ -442,12 +442,12 @@ class Tiler(object):
 
         if self.cp_lmax:
             skips = set()
-            print 'Source: direct copy rejigger %s => %s' % (self.src_dir,
-                                                             self.dst_basedir)
+            print('Source: direct copy rejigger %s => %s' % (self.src_dir,
+                                                             self.dst_basedir))
             # shutil.copytree(self.src_dir, self.dst_basedir)
             fnref = None
-            for x in xrange(cols):
-                for y in xrange(rows):
+            for x in range(cols):
+                for y in range(rows):
                     src_fn = self.get_tle_name_pr0nts(self.src_dir, y, x,
                                                       self.im_ext)
                     dst_fn = self.get_tile_name(self.dst_basedir, dst_level, y,
@@ -456,11 +456,11 @@ class Tiler(object):
                     try:
                         shutil.copyfile(src_fn, dst_fn)
                         if not fnref:
-                            print("Ex: %s => %s" % (src_fn, dst_fn))
+                            print(("Ex: %s => %s" % (src_fn, dst_fn)))
                         fnref = src_fn
                     except IOError as e:
                         skips.add((x, y, dst_fn))
-            print("Skip %s" % len(skips))
+            print(("Skip %s" % len(skips)))
             # must be done after as it may be hard to get a reference image
             if len(skips):
                 print("Creating fill image...")
@@ -484,31 +484,31 @@ class Tiler(object):
             raise Exception()
 
     def run_src_dir(self):
-        for dst_level in xrange(self.max_level, self.min_level - 1, -1):
-            print
-            print '************'
-            print 'Zoom level %d' % dst_level
+        for dst_level in range(self.max_level, self.min_level - 1, -1):
+            print()
+            print('************')
+            print('Zoom level %d' % dst_level)
 
             # For the first level we may just copy things over
             if dst_level == self.max_level:
                 self.copy_max_dir(dst_level)
             # Additional levels we take the image coordinate map and shrink
             else:
-                print 'Source: tiles'
+                print('Source: tiles')
                 self.subtile(dst_level, self.dst_basedir, self.get_tile_name,
                              self.dst_basedir, self.get_tile_name)
 
     def run_pim(self):
-        for dst_level in xrange(self.max_level, self.min_level - 1, -1):
-            print
-            print '************'
-            print 'Zoom level %d' % dst_level
+        for dst_level in range(self.max_level, self.min_level - 1, -1):
+            print()
+            print('************')
+            print('Zoom level %d' % dst_level)
 
             # For the first level slice up source
             # Used to do all levels but it would result in OOM crash on large images
             # Plus only base level needs needs quality
             if dst_level == self.max_level:
-                print 'Source: single image'
+                print('Source: single image')
                 pim = self.pim
                 tiler = ImageTiler(pim,
                                    dst_level,
@@ -520,7 +520,7 @@ class Tiler(object):
                 tiler.run()
             # Additional levels we take the image coordinate map and shrink
             else:
-                print 'Source: tiles'
+                print('Source: tiles')
                 self.subtile(dst_level, self.dst_basedir, self.get_tile_name,
                              self.dst_basedir, self.get_tile_name)
 

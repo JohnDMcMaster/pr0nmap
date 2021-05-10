@@ -19,9 +19,9 @@ def write_js(fn,
         square = int(math.ceil(math.log(tiles_max, 2)))
         image_size = (2**square) * tile_size
         if 0:
-            print('tiles: %0.1f' % tiles_max)
-            print('square:%u' % square)
-            print('image_size:%u' % image_size)
+            print(('tiles: %0.1f' % tiles_max))
+            print(('square:%u' % square))
+            print(('image_size:%u' % image_size))
             import sys
             sys.exit(0)
 
@@ -125,9 +125,9 @@ class GroupXIV:
         # generate javascript
         self.gen_js()
         if not self.js_only:
-            print
-            print
-            print
+            print()
+            print()
+            print()
 
             self.source.generate_tiles(self.max_level,
                                        self.min_level,

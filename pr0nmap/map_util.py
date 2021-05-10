@@ -25,7 +25,7 @@ def rotate_tiles(src_dir, dst_dir, degrees, force=False, rc=False):
         os.mkdir(dst_dir)
 
     if degrees == 0:
-        print 'WARNING: rotate got 0 degrees, aborting'
+        print('WARNING: rotate got 0 degrees, aborting')
         return
 
     # And that only if the tiles are the same width and height
@@ -34,11 +34,11 @@ def rotate_tiles(src_dir, dst_dir, degrees, force=False, rc=False):
         #if not degrees in [180]:
         raise Exception('Only right angle degrees currently supported')
 
-    print 'Rotating dir %s to dir %s %d degrees' % (src_dir, dst_dir, degrees)
+    print('Rotating dir %s to dir %s %d degrees' % (src_dir, dst_dir, degrees))
     icm = ImageCoordinateMap.from_dir_tagged_file_names(src_dir)
 
     # Verify uniform size
-    print "Verifying tile size...."
+    print("Verifying tile size....")
     self.tw = None
     self.th = None
     # For the first level we copy things over
@@ -86,7 +86,7 @@ def rotate_tiles(src_dir, dst_dir, degrees, force=False, rc=False):
         pi = PImage.from_file(src)
         # rotates CCW...w/e
         pip = pi.rotate(-degrees)
-        print '%d / %d: %s => %s' % (this_n, n, src, dst)
+        print('%d / %d: %s => %s' % (this_n, n, src, dst))
         pip.save(dst)
 
 

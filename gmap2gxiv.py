@@ -47,7 +47,7 @@ def run():
     maxy = 0
 
     for src_zoom_dir in glob.glob('%s/*' % src_dir):
-        print("Zoom %s" % src_zoom_dir)
+        print(("Zoom %s" % src_zoom_dir))
         src_level = int(os.path.basename(src_zoom_dir))
         dst_level = src_level + 1
         dst_zoom_dir = "%s/%s" % (dst_dir, dst_level)
@@ -84,9 +84,9 @@ def run():
         assert index
 
     layer_name, chip_name, copyright = index
-    print('Chip: %s' % chip_name)
-    print('Layer: %s' % layer_name)
-    print('Copyright: %s' % copyright)
+    print(('Chip: %s' % chip_name))
+    print(('Layer: %s' % layer_name))
+    print(('Copyright: %s' % copyright))
 
     chip_name_raw = chip_name
     if copyright:
