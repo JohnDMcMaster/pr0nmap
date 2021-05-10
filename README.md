@@ -64,3 +64,12 @@ TODO: consider removing entirely
 
 Since this tool was primarily intended for siliconpr0n.org use, it has a magic rule that can match if point it to a file in a directory named "single". Images are expected to be named $vendor_$chipname_$stuff and this simplifies the output name to $stuff. 
 
+# Version history
+
+2.0.0 (2021-05-10)
+  * python3 support
+  * First official release
+  * groupxiv (leaflet) as primary rendering engine
+
+1.0.0
+  * Google maps as primary rendering engine
