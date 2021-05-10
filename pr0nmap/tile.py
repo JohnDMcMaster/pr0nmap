@@ -308,9 +308,9 @@ class Tiler(object):
                 # 3 => 2
                 # 2 => 1
                 if x % 2 == 0:
-                    return x / 2
+                    return x // 2
                 else:
-                    return x / 2 + 1
+                    return x // 2 + 1
 
             rows = div_rnd(rows)
             cols = div_rnd(cols)
