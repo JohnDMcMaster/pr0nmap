@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 '''
 Generate a complete Google Map from pre-stitched input image(s)
 pre-stitched means non-overlapping
