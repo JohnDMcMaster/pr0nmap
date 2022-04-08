@@ -155,8 +155,8 @@ class ImageCoordinateMap:
         print('height %d rows, width %d cols' % (self.height(), self.width()))
         for row in range(self.height()):
             for col in range(self.width()):
-                print('  [r%d][c%d] = %s' % (row, col, self.get_image(
-                    col, row)))
+                print('  [r%d][c%d] = %s' %
+                      (row, col, self.get_image(col, row)))
 
     def get_image_safe(self, col, row):
         '''Returns none if out of bounds'''
@@ -230,7 +230,9 @@ class ImageCoordinateMap:
             cols = math.ceil(len(file_names) / rows)
 
         if rows is None or cols is None:
-            print('Row / col hints insufficient, guessing row / col layout from file names')
+            print(
+                'Row / col hints insufficient, guessing row / col layout from file names'
+            )
             row_parts = set([0])
             col_parts = set([0])
 
@@ -246,8 +248,8 @@ class ImageCoordinateMap:
             if rows is None:
                 print('Constructing rows from set %s' % str(row_parts))
                 rows = max(row_parts) + 1
-        print('initial cols / X dim / width: %d, rows / Y dim / height: %d' % (
-            cols, rows))
+        print('initial cols / X dim / width: %d, rows / Y dim / height: %d' %
+              (cols, rows))
 
         ret = ImageCoordinateMap(cols, rows)
         file_names = sorted(file_names)

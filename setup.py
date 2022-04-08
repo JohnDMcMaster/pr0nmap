@@ -42,8 +42,7 @@ setup(
     url='https://github.com/JohnDMcMaster/pr0nmap',
     packages=['pr0nmap'],
     scripts=scripts_dist,
-    install_requires=[
-    ],
+    install_requires=[],
     long_description="pr0nmap go vroom",
     classifiers=[
         "License :: OSI Approved :: BSD License",

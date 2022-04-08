@@ -65,9 +65,10 @@ def calc_max_level(height, width, zoom_factor=None):
         math.log(height, zoom_factor) - math.log(fit_height, zoom_factor))
     max_level = int(max(width_levels, height_levels, 0))
     # Take the number of zoom levels required to fit the entire thing on screen
-    print('Calc max zoom level for %d X %d screen: %d (wmax: %d lev / %d pix, hmax: %d lev / %d pix)' % (
-        fit_width, fit_height, max_level, width_levels, width, height_levels,
-        height))
+    print(
+        'Calc max zoom level for %d X %d screen: %d (wmax: %d lev / %d pix, hmax: %d lev / %d pix)'
+        % (fit_width, fit_height, max_level, width_levels, width,
+           height_levels, height))
     return max_level
 
 
@@ -153,8 +154,8 @@ class ImageTiler(object):
                 if self.progress_inc:
                     cur_progress = 1.0 * processed / n_images
                     if cur_progress >= next_progress:
-                        print('Progress: %02.2f%% %d / %d' % (
-                            cur_progress * 100, processed, n_images))
+                        print('Progress: %02.2f%% %d / %d' %
+                              (cur_progress * 100, processed, n_images))
                         next_progress += self.progress_inc
             col += 1
 
@@ -367,8 +368,8 @@ class Tiler(object):
         src_rows, src_cols = self.rcs[dst_level + 1]
         dst_rows, dst_cols = self.rcs[dst_level]
 
-        print('Shrink by %0.1f: cols %s => %s, rows %s => %s' % (
-            self.zoom_factor, src_cols, dst_cols, src_rows, dst_rows))
+        print('Shrink by %0.1f: cols %s => %s, rows %s => %s' %
+              (self.zoom_factor, src_cols, dst_cols, src_rows, dst_rows))
 
         next_progress = self.progress_inc
         done = 0
@@ -402,8 +403,8 @@ class Tiler(object):
                 done += 1
                 progress = 1.0 * done / dst_rows
                 if self.progress_inc and progress >= next_progress:
-                    print('Progress: %02.2f%% %d / %d' % (progress * 100, done,
-                                                          dst_rows))
+                    print('Progress: %02.2f%% %d / %d' %
+                          (progress * 100, done, dst_rows))
                     next_progress += self.progress_inc
 
             # More tasks to give?
@@ -442,8 +443,8 @@ class Tiler(object):
 
         if self.cp_lmax:
             skips = set()
-            print('Source: direct copy rejigger %s => %s' % (self.src_dir,
-                                                             self.dst_basedir))
+            print('Source: direct copy rejigger %s => %s' %
+                  (self.src_dir, self.dst_basedir))
             # shutil.copytree(self.src_dir, self.dst_basedir)
             fnref = None
             for x in range(cols):

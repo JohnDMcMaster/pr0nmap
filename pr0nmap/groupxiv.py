@@ -1,31 +1,32 @@
 import os
 import math
+import json
+"""
+TODO: provide clear documentation on how metadata is interpreted
+I think some of these are actually used by GroupXIV, some of these are placeholders I added
+
+Top level
+m["name"]
+    Becomes title bar on window
+m["copyright"]
+    Is this an error? Should be layer copyright?
+
+Layer
+l["name"])
+    Shown in lower right before layer copyright
+l["copyright"]
+    Shown in lower right. Copyright (C) is added by GroupXIV
+
+"""
 
 
-def write_js(fn,
-             width,
-             height,
-             tile_size,
-             layer_name,
-             chip_name,
-             chip_name_raw=None,
-             copyright=None,
-             tile_ext='.jpg',
-             url_base="https://siliconpr0n.org/lib/groupXIV/stable",
-             image_size=None):
-    if image_size is None:
-        # Round up to next power 2 tile size on largest dimension
-        tiles_max = float(max(width, height)) / tile_size
-        square = int(math.ceil(math.log(tiles_max, 2)))
-        image_size = (2**square) * tile_size
-        if 0:
-            print(('tiles: %0.1f' % tiles_max))
-            print(('square:%u' % square))
-            print(('image_size:%u' % image_size))
-            import sys
-            sys.exit(0)
-
-    open(fn, 'w').write('''\
+def write_js_meta(
+    fn,
+    meta,
+    url_base="https://siliconpr0n.org/lib/groupXIV/stable",
+):
+    assert len(meta["layers"]) == 1, len(meta["layers"])
+    out = '''\
 <!DOCTYPE html>
 <html>
   <head>
@@ -33,16 +34,22 @@ def write_js(fn,
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script type="text/javascript" src="%s/groupxiv.js"></script>
     <link type="text/css" rel="stylesheet" href="%s/groupxiv.css">
-</head>
+</head>''' % (url_base, url_base)
+    out += '''\
 <body>
     <div id="viewer"></div>
     <script>
-    initViewer({"tilesAlignedTopLeft": true, "scale": null, "layers": [{"imageSize": %s, "tileExt": "%s", "width": %u, "height": %u, "URL": "l1", "tileSize": %u, "name": "%s"}], "name": "%s", "name_raw": "%s", "copyright": "%s"});
+'''
+    out += '''\
+    initViewer(%s);
+''' % json.dumps(meta)
+
+    out += '''\
     </script>
 </body>
 </html>
-''' % (url_base, url_base, image_size, tile_ext, width, height, tile_size,
-       layer_name, chip_name, chip_name_raw, copyright))
+'''
+    open(fn, 'w').write(out)
 
 
 class GroupXIV:
@@ -105,15 +112,36 @@ class GroupXIV:
         if not os.path.exists(self.out_dir):
             os.mkdir(self.out_dir)
 
-        write_js('%s/index.html' % self.out_dir,
-                 width=self.source.width(),
-                 height=self.source.height(),
-                 tile_size=self.tile_size,
-                 layer_name="%s, %s" %
-                 (self.source.get_name(), self.copyright),
-                 chip_name="???",
-                 copyright=self.copyright,
-                 tile_ext='.jpg')
+        def calc_image_size(l):
+            # Round up to next power 2 tile size on largest dimension
+            tiles_max = float(max(l["width"], l["height"])) / l["tileSize"]
+            square = int(math.ceil(math.log(tiles_max, 2)))
+            l["imageSize"] = (2**square) * l["tileSize"]
+
+        # Fix image pan parameters
+        # This is the most visible problem
+        meta = {
+            'tilesAlignedTopLeft':
+            True,
+            'scale':
+            None,
+            'layers': [{
+                'imageSize': None,
+                'tileExt': '.jpg',
+                'width': self.source.width(),
+                'height': self.source.height(),
+                'URL': 'l1',
+                'tileSize': self.tile_size,
+                'name': self.source.get_name()
+            }],
+            'name':
+            self.source.get_name()
+        }
+        l1 = meta["layers"][0]
+        if self.copyright:
+            l1['copyright'] = self.copyright
+        calc_image_size(meta["layers"][0])
+        write_js_meta('%s/index.html' % self.out_dir, meta=meta)
 
     def run(self):
         '''
