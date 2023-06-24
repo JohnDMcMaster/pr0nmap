@@ -12,7 +12,10 @@ import sys
 import os.path
 from PIL import Image
 Image.MAX_IMAGE_PIXELS = None
-import shutil
+# 2023-06-23: some large images require this
+# Unclear if they are actually damaged, but life moves on with this set
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = Trueimport shutil
 import math
 import queue
 import multiprocessing
