@@ -15,7 +15,8 @@ Image.MAX_IMAGE_PIXELS = None
 # 2023-06-23: some large images require this
 # Unclear if they are actually damaged, but life moves on with this set
 from PIL import ImageFile
-ImageFile.LOAD_TRUNCATED_IMAGES = Trueimport shutil
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+import shutil
 import math
 import queue
 import multiprocessing
