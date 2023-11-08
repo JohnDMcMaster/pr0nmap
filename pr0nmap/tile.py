@@ -225,7 +225,7 @@ class TWorker(object):
 
             img_full = pimage.from_fns(src_img_fns, tw=self.tw, th=self.th)
             #img_full = pimage.im_reload(img_full)
-            img_scaled = pimage.rescale(img_full, 0.5, filt=Image.ANTIALIAS)
+            img_scaled = pimage.rescale(img_full, 0.5, filt=Image.Resampling.LANCZOS)
             dst_fn = dst_get_tile_name(dst_basedir, src_level - 1, dst_row,
                                        dst_col, self.im_ext)
             img_scaled.save(dst_fn)
