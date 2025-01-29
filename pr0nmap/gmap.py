@@ -2,9 +2,9 @@ import os
 
 
 class GMap:
-    def __init__(self, source, copyright=None):
+    def __init__(self, source, copyright_=None):
         self.source = source
-        self.copyright = copyright
+        self.copyright_ = copyright_
 
         self.page_title = None
         # Consider mangling this pased on the image name
@@ -202,7 +202,7 @@ siMap.mapTypes.set('%s', %s);
 siMap.setMapTypeId('%s');
 ''' % (self.type_obj_name(), self.type_obj_name(), self.type_obj_name(),
         self.type_obj_name())
-        if self.copyright:
+        if self.copyright_:
             ret += '''
 // Create div for showing copyrights.
 var copyrightNode;

@@ -53,9 +53,9 @@ def write_js_meta(
 
 
 class GroupXIV:
-    def __init__(self, source, copyright=None):
+    def __init__(self, source, copyright_=None):
         self.source = source
-        self.copyright = copyright
+        self.copyright_ = copyright_
 
         self.title = None
         self.out_dir = 'map'
@@ -138,8 +138,8 @@ class GroupXIV:
             self.source.get_name()
         }
         l1 = meta["layers"][0]
-        if self.copyright:
-            l1['copyright'] = self.copyright
+        if self.copyright_:
+            l1['copyright'] = self.copyright_
         calc_image_size(meta["layers"][0])
         write_js_meta('%s/index.html' % self.out_dir, meta=meta)
 
