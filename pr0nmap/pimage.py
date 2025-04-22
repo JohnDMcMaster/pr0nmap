@@ -3,11 +3,10 @@ TODO: get rid of this file
 '''
 
 from PIL import Image
+
 Image.MAX_IMAGE_PIXELS = None
 import os
 
-# needed for PNG support
-# rarely used and PIL seems to have bugs
 PALETTES = bool(os.getenv('PR0N_PALETTES', ''))
 
 
@@ -205,6 +204,7 @@ class PImage:
     def file_name(self):
         return self.image.fp.name
 
+    '''
     def set_canvas_size(self, width, height):
         # Simple case: nothing to do
         if self.width() == width and self.height == height:
@@ -216,6 +216,7 @@ class PImage:
         ip.paste(self.image, (0, 0))
         # Shift the old image out
         self.image = ip
+    '''
 
     def paste(self, img, x, y):
         #self.image.paste(img, (x, y))

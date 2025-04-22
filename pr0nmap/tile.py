@@ -11,10 +11,12 @@ from pr0nmap import tile_name
 import sys
 import os.path
 from PIL import Image
+
 Image.MAX_IMAGE_PIXELS = None
 # 2023-06-23: some large images require this
 # Unclear if they are actually damaged, but life moves on with this set
 from PIL import ImageFile
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 import shutil
 import math
@@ -82,14 +84,16 @@ Take a single large image and break it into tiles
 
 
 class ImageTiler(object):
+
     def __init__(self,
                  pim,
                  level,
                  dst_dir,
                  tw=250,
                  th=250,
-                 im_ext='.jpg',
+                 im_ext=None,
                  get_tile_name=None):
+        assert im_ext
         self.verbose = False
         self.pim = pim
         self.level = level
@@ -170,14 +174,15 @@ Only support tiled workers since unclear if full image can/should be parallelize
 
 
 class TWorker(object):
+
     def __init__(
-        self,
-        ti,
-        qo,
-        im_ext,
-        # tile width/height
-        tw,
-        th):
+            self,
+            ti,
+            qo,
+            im_ext,
+            # tile width/height
+            tw,
+            th):
         self.process = multiprocessing.Process(target=self.run)
         self.ti = ti
 
@@ -185,6 +190,7 @@ class TWorker(object):
         self.qo = qo
         self.running = multiprocessing.Event()
 
+        assert im_ext
         self.im_ext = im_ext
         self.tw = tw
         self.th = th
@@ -225,7 +231,7 @@ class TWorker(object):
 
             img_full = pimage.from_fns(src_img_fns, tw=self.tw, th=self.th)
             #img_full = pimage.im_reload(img_full)
-            img_scaled = pimage.rescale(img_full, 0.5, filt=Image.ANTIALIAS)
+            img_scaled = pimage.rescale(img_full, 0.5, filt=Image.LANCZOS)
             dst_fn = dst_get_tile_name(dst_basedir, src_level - 1, dst_row,
                                        dst_col, self.im_ext)
             img_scaled.save(dst_fn)
@@ -267,6 +273,7 @@ Creates smaller tiles from source tiles
 
 
 class Tiler(object):
+
     def __init__(self,
                  rows,
                  cols,
@@ -278,8 +285,9 @@ class Tiler(object):
                  pim=None,
                  tw=250,
                  th=250,
-                 im_ext='.jpg',
+                 im_ext=None,
                  get_tile_name=None):
+        assert im_ext
         self.src_dir = src_dir
         self.pim = pim
         self.get_tile_name = get_tile_name

@@ -14,6 +14,7 @@ Not an actual image
 
 
 class ImageCoordinateMapPairing:
+
     def __init__(self, col, row):
         self.col = col
         self.row = row
@@ -34,6 +35,7 @@ class ImageCoordinateMapPairing:
 
 
 class ImageCoordinatePair:
+
     def __init__(self, first, second):
         # Of type ImageCoordinateMapPairing
         self.first = first
@@ -41,8 +43,9 @@ class ImageCoordinatePair:
 
     def adjacent(self):
         '''Return true if the two images are cow/col directly adjacent'''
-        return abs(self.first.row - self.second.row) <= 1 and abs(
-            self.first.col - self.second.col) <= 1
+        return abs(self.first.row -
+                   self.second.row) <= 1 and abs(self.first.col -
+                                                 self.second.col) <= 1
 
     def __cmp__(self, other):
         delta = self.first.__compare__(other.first)
@@ -112,6 +115,7 @@ class ImageCoordinateMap:
     y    1        [0, 1]    [1, 1]    [2, 1]
          2        [0, 2]    [1, 2]    [2, 2] 
     '''
+
     def __init__(self, cols, rows):
         # The actual imageimage_file_names position mapping
         # Maps rows and cols to image file names

@@ -2,6 +2,7 @@ import os
 
 
 class GMap:
+
     def __init__(self, source, copyright_=None):
         self.source = source
         self.copyright_ = copyright_

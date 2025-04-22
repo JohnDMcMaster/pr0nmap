@@ -67,7 +67,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     for image_in in args.images_in:
-        im_ext = args.out_extension
         out_dir = args.out
 
         if os.path.isdir(image_in):
@@ -88,14 +87,10 @@ if __name__ == "__main__":
                     out_dir = os.path.join(
                         os.path.dirname(os.path.dirname(image_in)), flavor)
                     print(('Auto-naming output file for sipr0n: %s' % out_dir))
-            if not im_ext:
-                im_ext = '.' + image_in.split('.')[-1]
             source = ImageMapSource(image_in, threads=args.threads)
 
         if not out_dir:
             out_dir = "map"
-        if not im_ext:
-            im_ext = '.jpg'
 
         title = args.title
         if args.title_name:
@@ -110,6 +105,7 @@ if __name__ == "__main__":
         m.set_js_only(args.js_only)
         m.set_skip_missing(args.skip_missing)
         m.set_out_dir(out_dir)
-        m.set_im_ext(im_ext)
+        if args.out_extension:
+            m.set_im_ext(args.out_extension)
 
         m.run()

@@ -1,4 +1,5 @@
 from pr0nmap.pimage import PImage
+from pr0nmap import pimage
 from pr0nmap.tile import Tiler, calc_max_level
 from pr0nmap.image_coordinate_map import ImageCoordinateMap
 import os
@@ -13,11 +14,12 @@ Two options:
 
 
 class MapSource:
-    def __init__(self):
-        self.set_im_ext('.jpg')
 
-    def set_im_ext(self, s):
-        self.im_ext = s
+    def __init__(self):
+        pass
+
+    def im_ext(self):
+        raise Exception("Implement")
 
     def width(self):
         return None
@@ -34,13 +36,24 @@ class MapSource:
 
 # Input to map generator algorithm is a large input image
 class ImageMapSource(MapSource):
+
     def __init__(self, image_in, threads=1):
         self.image_in = image_in
         self.pim = PImage.from_file(self.image_in)
-        self.im_ext = '.jpg'
         self.threads = threads
         self.tw = 250
         self.th = 250
+        _root, extension = os.path.splitext(image_in)
+        if extension in (".jpg", ".jpeg"):
+            self._im_ext = '.jpg'
+        elif extension == ".png":
+            self._im_ext = ".png"
+            # hack
+            pimage.PALETTES = True
+        elif extension in (".tif", ".tiff"):
+            self._im_ext = ".tif"
+        else:
+            raise ValueError(f"Unknown image extension {extension}")
 
     def get_name(self):
         return os.path.basename(self.image_in).split('.')[0]
@@ -50,6 +63,12 @@ class ImageMapSource(MapSource):
 
     def height(self):
         return self.pim.height()
+
+    def set_im_ext(self, im_ext):
+        self._im_ext = im_ext
+
+    def im_ext(self):
+        return self._im_ext
 
     def generate_tiles(self, max_level, min_level, get_tile_name, dst_basedir):
         # Generate tiles
@@ -67,13 +86,14 @@ class ImageMapSource(MapSource):
                     dst_basedir=dst_basedir,
                     threads=self.threads,
                     pim=self.pim,
-                    im_ext=self.im_ext,
+                    im_ext=self.im_ext(),
                     get_tile_name=get_tile_name)
 
         gen.run()
 
 
 class TileMapSource(MapSource):
+
     def __init__(self, dir_in, threads=1):
         print('TileMapSource()')
         self.tw = 250
@@ -100,6 +120,9 @@ class TileMapSource(MapSource):
 
         MapSource.__init__(self)
 
+    def im_ext(self):
+        return ".jpg"
+
     def get_name(self):
         # Get the last directory component
         ret = os.path.basename(self.src_dir)
@@ -123,6 +146,6 @@ class TileMapSource(MapSource):
                     dst_basedir=dst_basedir,
                     threads=self.threads,
                     pim=None,
-                    im_ext=self.im_ext,
+                    im_ext=self.im_ext(),
                     get_tile_name=get_tile_name)
         gen.run()

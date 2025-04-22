@@ -53,6 +53,7 @@ def write_js_meta(
 
 
 class GroupXIV:
+
     def __init__(self, source, copyright_=None):
         self.source = source
         self.copyright_ = copyright_
@@ -64,7 +65,6 @@ class GroupXIV:
         self.image = None
         # don't error on missing tiles in grid
         self.skip_missing = False
-        self.set_im_ext('.jpg')
         # GroupXIV default is 500, but pr0nmap was 250
         self.tile_size = 250
         self.js_only = False
@@ -80,10 +80,6 @@ class GroupXIV:
 
     def set_out_dir(self, out_dir):
         self.out_dir = out_dir
-
-    def set_im_ext(self, s):
-        self.im_ext = s
-        self.source.im_ext = s
 
     # FIXME / TODO: this isn't the google reccomended naming scheme, look into that more
     # part of it was that I wanted them to sort nicely in file list view
@@ -127,7 +123,7 @@ class GroupXIV:
             None,
             'layers': [{
                 'imageSize': None,
-                'tileExt': '.jpg',
+                'tileExt': self.source.im_ext(),
                 'width': self.source.width(),
                 'height': self.source.height(),
                 'URL': 'l1',
